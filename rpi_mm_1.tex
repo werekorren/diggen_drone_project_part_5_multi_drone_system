@@ -54,7 +54,7 @@
 \newcommand{\tabreff}[2]{Tables~\ref{tab:#1} and \ref{tab:#2}}
 \newcommand{\tabrefff}[3]{Tables~\ref{tab:#1}, \ref{tab:#2} and \ref{tab:#3}}
 
-\def\year{2024--2025}
+\def\year{2025--2026}
 \title{EITA65 Design of Systems for Digital Transformation\\\year}
 %\title{EITA65 Digitalisering -- realisering och systemdesign med användarperspektiv\\\year}
 \author{\huge Multi-Drone System\\Drone Project -- Part 5}
@@ -126,7 +126,7 @@ In this part, you will extend the system you built in the previous lab to a more
 There are some things that you need to know before you go to the lab. This is a group task, so you will need to work in your group with all the other members. You also need to know the following items in advance:
 \begin{itemize}
     \item  You will need to use the local area network you set up in the previous assignment -- the switch will be used once again.
-    \item Each group needs to bring at least {\bf three} Raspberry Pis to the lab.
+    \item Each group should bring at least {\bf three} Raspberry Pis. It is possible to do the lab with only two Raspberry Pis (or even with only one, but it defeats some of the purpose of the assignment) -- see the note at the end of the instructions if you do not have three Raspberry Pis available).
     \item One of the Raspberry Pis will need to run the server and the other Pis will simulate one drone each. If you wish to, you can replace the Server Pi with your own laptop, but make sure that they are all connected to the LAN you have built.
     \item You will, as before, not be handed step-by-step introductions, but please utilize Internet searches for knowledge as you encounter the need.
 \end{itemize}
@@ -147,9 +147,9 @@ Now let us take a look at each system component to see what work you need to do 
 On each Drone Pi, you need to run a flask server (\verb!drone.py!) that listens to delivery requests sent from the route planner. Once the request has been received, it will invoke \verb!simulator.py! to run the delivery simulation. The functionalities you need to complete in this script are:
 \begin{enumerate}
     \item You need to assign an ID to the Drone Pi. This ID should be unique for each Drone Pi that runs the script.
-    \item Before you start listening for requests, you need to get the Pis current longitude and latitude to send to the Redis database on the server side. The longitude and latitude should be in OSM\cite{OSM} coordinates, so you need to either assign one manually or to create a text file and read the coordinate from there.
+    \item Before you start listening for requests, you need to get the Pis initial longitude and latitude to send to the Redis database on the server side. The longitude and latitude should be in OSM\cite{OSM} coordinates, so you need to either assign a position manually or to create a text file and read the coordinates from there.
     \item To send the initial coordinates of the drone, you need to fill in the server's IP address and port number. Think about which server on the Server Pi that can update the drone information in the Redis database.
-    \item As in LP 2, to invoke the simulator, you need to pass the arguments of \verb!current_coords!, \verb!from_coords! and \verb!to_coords!. The \verb!from_coords! and \verb!to_coords! values can be extracted from the request, but you need to find \verb!current_coords! on your own. But you cannott read it from the Redis server, since it is running on a different Raspberry Pi. Find a way to keep track of your own location on the Drone Pi. Hint : See task \ref{t2} in the next paragraph for simulator.py, you will use the same file.
+    \item As in LP 2, to invoke the simulator, you need to pass the arguments of \verb!current_coords!, \verb!from_coords! and \verb!to_coords!. The \verb!from_coords! and \verb!to_coords! values can be extracted from the request, but you need to find \verb!current_coords! on your own. But you cannot read it from the Redis server, since it is running on a different Raspberry Pi. Find a way to keep track of your own location on the Drone Pi. Hint : See task \ref{t2} in the next paragraph for simulator.py, you will use the same file.
 \end{enumerate}
 
 \subsubsection{simulator.py}
@@ -167,7 +167,7 @@ This is the webserver that hosts the HTML file containing the map. The HTML page
 \begin{enumerate}
     \item Put in the correct address of the Redis server.
     \item Read the information about all drones from the Redis server including the Drone ID, longitude, latitude and status ('busy' or 'idle') for each drone.
-    \item Put the information in a nested dictionary. The client will only accepts JSON responses (see \cite{json}) in a specific format, so the dictionary needs to have the same format as the example given in the code comments(see source code build.py).
+    \item Put the information in a nested dictionary. The client will only accepts JSON responses (see \cite{json}) in a specific format, so the dictionary needs to have the same format as the example given in the code comments(see the source code for build.py).
     \item The longitude and latitude in the response should be SVG values, but you will get OSM values from the database. Thus, before entering these data into the response dictionary, use the \verb!translate()! function to convert OSM coordinates to SVG coordinates.
 \end{enumerate}
 
@@ -178,7 +178,7 @@ The database server listens for requests from drones, and incoming requests cont
 As in previous labs, the route planner gets the addresses you input on the webpage, searches for the OSM coordinates of the input addresses and sends the coordinates to a drone. Since, in this system, you have more than one drone, an additional task of the route planner is to find a drone that is available (not busy with a delivery mission), and send the delivery request to the available drone. You need to complete the task of finding an available drone and send the job request to the drone:
 \begin{enumerate}
     \item Put in the correct address of the Redis server.
-    \item Find an available drone in the Redis database by first searching for the status of all drones in the database server. If the drone status is 'busy', its not available. If the status is 'idle', the drone is available.
+    \item Find an available drone in the Redis database by first searching for the status of all drones in the database server. If the drone status is 'busy', it is not available. If the status is 'idle', the drone is available.
     \begin{itemize}
         \item If there is no drone available, you need to return the message {\textsc{`No available drone, try later'}} as response.
         \item If there is an available drone, get the IP address of the drone in the database, compose the URL with the IP and send coordinates in the HTTP request to the drone. An example of how to send such a request is given in the code. After sending the request, you must return the message\textsc{`Got address and sent request to the drone'} as response.
@@ -192,15 +192,22 @@ When you have finished all tasks, you should be able to run the system following
 \huge Good luck!
 \end{center}
 
+\section*{Running the assignment on less than three Raspberry Pis}
+If you only have two Raspberry Pis available you will need to run one of the drone controllers on the same Raspberry Pi running the servers. In order to do this some changes are needed since both \verb!drone.py! and \verb!build.py! attempts to use port 5000 as a connection point, which would cause a conflict. It is therefore suggested that you change the port used by \verb!drone.py! to 5004. This means that you will have to modify \verb!route_planner.py! such that it connects to the drones on port 5004 instead of 5000. It also means that you will have to start the drones with the command:
+\begin{equation}
+\verb!flask run --port=5004 --host 0.0.0.0!
+\end{equation}
+Similarly, it would be possible to run both drone servers on the same Raspberry Pi running the servers, but we advice against it since it would take the network dimension out of the problem and defeat some of the purpose of the assignment. It should therefore only be done when no other alternative remains. In this case, the two drones would have to use different port numbers, e.g. 5004 and 5005, in order to avoid conflict and \verb!route_planner.py! would have to be modified accordingly.
+
 \begin{thebibliography}{10} \bibliographystyle{plain}
 
-\bibitem{json} JavaScript Object Notation (JSON) -- Wikipedia, \url{https://en.wikipedia.org/wiki/JSON}, last accessed on 2024-01-20.
+\bibitem{json} JavaScript Object Notation (JSON) -- Wikipedia, \url{https://en.wikipedia.org/wiki/JSON}, last accessed on 2025-12-22.
 
-\bibitem{OSM} OpenStreetMap, \url{https://www.openstreetmap.org/#map=14/55.7059/13.2005}, last accessed on 2024-01-20.
+\bibitem{OSM} OpenStreetMap, \url{https://www.openstreetmap.org/#map=14/55.7059/13.2005}, last accessed on 2025-12-22.
 
 %\bibitem{try} Try and Except in Python, \url{https://pythonbasics.org/try-except/}, last accessed on 2024-01-25.
 
-\bibitem{open} Python open() function, \url{https://www.geeksforgeeks.org/writing-to-file-in-python/}, last accessed on 2024-01-20.
+\bibitem{open} Python open() function, \url{https://www.geeksforgeeks.org/writing-to-file-in-python/}, last accessed on 2025-12-22.
 
 \end{thebibliography}
 
