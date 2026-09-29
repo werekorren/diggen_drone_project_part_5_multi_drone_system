@@ -54,8 +54,8 @@
 \newcommand{\tabreff}[2]{Tables~\ref{tab:#1} and \ref{tab:#2}}
 \newcommand{\tabrefff}[3]{Tables~\ref{tab:#1}, \ref{tab:#2} and \ref{tab:#3}}
 
-\def\year{2025--2026}
-\title{EITA65 Design of Systems for Digital Transformation\\\year}
+\def\year{2026--2027}
+\title{EITA66 Design of Systems for Digital Transformation\\\year}
 %\title{EITA65 Digitalisering -- realisering och systemdesign med användarperspektiv\\\year}
 \author{\huge Multi-Drone System\\Drone Project -- Part 5}
 %\\Version \DTMnow}
@@ -139,7 +139,9 @@ There are some things that you need to know before you go to the lab. This is a 
     \caption{Two-drone system architecture.}
     \label{fig:sys}
 \end{figure}
-\Cref{fig:sys} illustrates the architecture of a two-drone system that you need to build. You can think of this illustration as being part of a system specification document. As you can see, you need to run all the servers on the Server Pi, and the drone simulator on each of the Drone Pis. You need to fork {\color{blue}{ \href{https://github.com/rogerhenriksson/InfoCom-Drone-5-Multi-drone_System}{this GitHub repository}}} and clone it on all the Raspberry Pis and run the scripts on the corresponding devices. It is suggested to fork the repository for each group and then use the same repository for all group members. Before you run the system, you need to fill in some missing code as indicated in the comments, as well as in this introduction. The majority of the coding tasks are on the server side, so you first need to make a sketch of the system all together and to distribute the coding tasks evenly. Intense collaboration is required in this lab.
+\Cref{fig:sys} illustrates the architecture of a two-drone system that you need to build. You can think of this illustration as being part of a system specification document. As you can see, you need to run all the servers on the Server Pi, and the drone simulator on each of the Drone Pis.
+
+You need to clone {\color{blue}{ \href{https://github.com/rogerhenriksson/InfoCom-Drone-5-Multi-drone_System}{this GitHub repository (https://github.com/rogerhenriksson/InfoCom-Drone-5-Multi-drone\_System)}}} on all the Raspberry Pis and run the scripts on the corresponding devices. It is suggested to fork the repository for each group and then use the same repository for all group members. Before you run the system, you need to fill in some missing code as indicated in the comments, as well as in this introduction. The majority of the coding tasks are on the server side, so you first need to make a sketch of the system all together and to distribute the coding tasks evenly. Intense collaboration is required in this lab.
 
 Now let us take a look at each system component to see what work you need to do in order to complete the system.
 \subsection{The Drone Pis}
